@@ -8,13 +8,17 @@ describe('@senguoyun/dsh-arkme-world package contract', () => {
   it('ships as an independent DSH client plugin and uses only the official sidebar slot', () => {
     const manifest = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')) as {
       name: string
+      files?: string[]
       repository?: { url?: string }
-      dsh?: { client?: { inject?: string[]; platform?: string } }
+      dsh?: { bundle?: { patch?: string }; client?: { inject?: string[]; platform?: string } }
     }
     const source = readFileSync(resolve(root, 'src/client/index.tsx'), 'utf8')
 
     expect(manifest.name).toBe('@senguoyun/dsh-arkme-world')
     expect(manifest.repository?.url).toBe('git+https://github.com/LoveYou9t/arkme-dsh-world-plugin.git')
+    expect(manifest.dsh?.bundle?.patch).toBe('./cordis.patch.yml')
+    expect(manifest.files).toContain('cordis.patch.yml')
+    expect(readFileSync(resolve(root, 'cordis.patch.yml'), 'utf8').trim()).toBe('[]')
     expect(manifest.dsh?.client?.platform).toBe('web')
     expect(manifest.dsh?.client?.inject).toContain('@deepseek-ai/dsh-client-ui-sidebar')
     expect(source).toContain("ctx.slots.inject('sidebar.footer.action'")

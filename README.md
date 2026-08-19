@@ -1,6 +1,6 @@
 # Arkme World for DeepSeek Harness
 
-Arkme World 是一个独立的 DeepSeek Harness 桌面端的Arkme插件的子插件。它把 Arkme 移动端“世界”的公开内容投影到 DSH，复用 `@senguoyun/dsh-arkme` Provider 的登录态、头像解析与受控图片读取能力，不自行保存账号凭据。
+Arkme World 是一个 DeepSeek Harness 桌面端的 Arkme 插件的子插件。它把 Arkme 移动端“世界”的公开内容投影到 DSH，复用 `@senguoyun/dsh-arkme` Provider 的登录态、头像解析与受控图片读取能力，不自行保存账号凭据。
 
 ## 能力
 

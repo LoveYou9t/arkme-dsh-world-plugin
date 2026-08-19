@@ -1,0 +1,81 @@
+{
+  "name": "@senguoyun/dsh-arkme-world",
+  "version": "0.1.0",
+  "description": "Desktop World surface for the Arkme DeepSeek Harness provider",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arkme-senx/arkme-dsh-world-plugin.git"
+  },
+  "homepage": "https://github.com/arkme-senx/arkme-dsh-world-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/arkme-senx/arkme-dsh-world-plugin/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "types": "./lib/types/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["lib"],
+  "dsh": {
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ],
+      "platform": "web"
+    }
+  },
+  "scripts": {
+    "build": "pnpm run build:types && pnpm run bundle",
+    "build:types": "tsc --project tsconfig.json --emitDeclarationOnly",
+    "bundle": "tsdown",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "test": "vitest run tests",
+    "prepare": "pnpm run build"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-client-runtime": "^0.1.0-rc.5",
+    "@deepseek-ai/dsh-client-ui-layout": "^0.1.0-rc.5",
+    "@deepseek-ai/dsh-client-ui-sidebar": "^0.1.0-rc.5",
+    "@deepseek-ai/dsh-client-ui-slots": "^0.1.0-rc.5",
+    "@senguoyun/dsh-arkme": ">=0.1.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.1",
+    "@deepseek-ai/dsh-client-runtime": "0.1.0-rc.7",
+    "@deepseek-ai/dsh-client-ui-layout": "0.1.0-rc.7",
+    "@deepseek-ai/dsh-client-ui-sidebar": "0.1.0-rc.7",
+    "@deepseek-ai/dsh-client-ui-slots": "0.1.0-rc.7",
+    "@senguoyun/dsh-arkme": "0.1.4",
+    "@types/node": "22.20.0",
+    "@types/react": "~18.3.1",
+    "@types/react-dom": "~18.3.1",
+    "lightningcss": "1.32.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "tsdown": "0.22.2",
+    "typescript": "6.0.3",
+    "vitest": "4.1.8"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "packageManager": "pnpm@11.7.0"
+}

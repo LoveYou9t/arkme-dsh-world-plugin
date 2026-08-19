@@ -5,11 +5,11 @@
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arkme-senx/arkme-dsh-world-plugin.git"
+    "url": "git+https://github.com/LoveYou9t/arkme-dsh-world-plugin.git"
   },
-  "homepage": "https://github.com/arkme-senx/arkme-dsh-world-plugin#readme",
+  "homepage": "https://github.com/LoveYou9t/arkme-dsh-world-plugin#readme",
   "bugs": {
-    "url": "https://github.com/arkme-senx/arkme-dsh-world-plugin/issues"
+    "url": "https://github.com/LoveYou9t/arkme-dsh-world-plugin/issues"
   },
   "publishConfig": {
     "access": "public"

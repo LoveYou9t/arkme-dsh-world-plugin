@@ -74,7 +74,41 @@
 .imageButton .worldImage { transition: transform 150ms ease, filter 150ms ease; }
 .imageButton:hover .worldImage { transform: scale(1.015); filter: brightness(.96); }
 @keyframes sweep { to { transform: translateX(100%); } }
-.cardFooter { min-height: 20px; margin-top: 15px; padding-top: 12px; display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid var(--dsw-alias-border-l1, #eceef0); color: var(--dsw-alias-label-tertiary, #9198a1); font-size: 11px; line-height: 18px; }
+.cardFooter { min-height: 28px; margin-top: 15px; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid var(--dsw-alias-border-l1, #eceef0); color: var(--dsw-alias-label-tertiary, #9198a1); font-size: 11px; line-height: 18px; }
+.cardFooter button { border: 0; border-radius: 999px; padding: 5px 10px; background: var(--dsw-alias-fill-secondary, #f3f4f5); color: var(--dsw-alias-label-secondary, #676e77); cursor: pointer; font: inherit; font-size: 11px; }
+.cardFooter button:hover, .cardFooter button:focus-visible { background: var(--dsw-alias-interactive-bg-hover, #e8ebef); color: var(--dsw-alias-label-primary, #17191c); }
+
+.interactionPanel { width: min(760px, calc(100% - 40px)); min-height: 100%; margin: 0 auto; padding: 24px 0 34px; box-sizing: border-box; }
+.interactionHeader { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.interactionHeader > div { display: flex; align-items: baseline; gap: 10px; }
+.interactionHeader span { color: var(--dsw-alias-label-tertiary, #969ca5); font-size: 11px; letter-spacing: .08em; }
+.interactionHeader strong { font-size: 14px; }
+.interactionHeader button, .interactionNotice button, .interactionContent button, .replyTarget button { border: 0; border-radius: 999px; padding: 6px 10px; background: var(--dsw-alias-fill-secondary, #f2f3f4); color: var(--dsw-alias-label-secondary, #676e77); cursor: pointer; font: inherit; font-size: 11px; }
+.interactionRoot { margin-top: 16px; padding: 18px 20px; border: 1px solid var(--dsw-alias-border-l1, #e8eaed); border-radius: 14px; background: var(--dsw-alias-bg-base, #fff); }
+.interactionRoot h2 { margin: 0; font: 500 18px/1.5 serif; }
+.interactionRoot p { margin: 8px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.7; }
+.interactionList { margin: 16px 0; display: flex; flex-direction: column; gap: 2px; }
+.interactionNotice { min-height: 76px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--dsw-alias-label-secondary, #717780); font-size: 12px; }
+.interactionItem { padding: 14px 4px; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid var(--dsw-alias-border-l1, #eceef0); }
+.interactionReply { margin-left: 44px; }
+.interactionAvatar, .interactionItem .avatarFallback { width: 32px; height: 32px; flex: none; border-radius: 50%; object-fit: cover; }
+.interactionContent { flex: 1; min-width: 0; }
+.interactionContent header { display: flex; align-items: baseline; gap: 8px; }
+.interactionContent header strong { font-size: 12px; }
+.interactionContent time { color: var(--dsw-alias-label-tertiary, #969ca5); font-size: 10px; }
+.interactionContent p { margin: 5px 0 7px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; line-height: 1.65; }
+.interactionContent button { padding: 3px 8px; background: transparent; color: var(--dsw-alias-label-tertiary, #8d949d); }
+.interactionLoadMore { min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--dsw-alias-state-error-primary, #c2413b); font-size: 11px; }
+.interactionLoadMore button { border: 1px solid var(--dsw-alias-border-l2, #d7dbe0); border-radius: 999px; padding: 6px 12px; background: var(--dsw-alias-bg-base, #fff); color: var(--dsw-alias-label-secondary, #676e77); cursor: pointer; font: inherit; font-size: 11px; }
+.interactionLoadMore button:disabled { opacity: .5; cursor: default; }
+.interactionComposer { position: sticky; bottom: 0; padding: 12px; border: 1px solid var(--dsw-alias-border-l1, #e2e5e8); border-radius: 14px; background: color-mix(in srgb, var(--dsw-alias-bg-base, #fff) 96%, transparent); backdrop-filter: blur(12px); box-shadow: 0 8px 24px rgba(20, 24, 31, .08); }
+.replyTarget { margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; color: var(--dsw-alias-label-secondary, #676e77); font-size: 11px; }
+.replyTarget button { padding: 3px 8px; }
+.interactionComposer textarea { width: 100%; min-height: 72px; resize: vertical; box-sizing: border-box; border: 0; outline: none; padding: 2px; background: transparent; color: var(--dsw-alias-label-primary, #17191c); font: inherit; font-size: 13px; line-height: 1.6; }
+.composerActions { min-height: 32px; display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.composerActions span { flex: 1; color: var(--dsw-alias-state-error-primary, #c2413b); font-size: 11px; }
+.composerActions button { min-width: 72px; border: 0; border-radius: 999px; padding: 7px 14px; background: var(--dsw-alias-label-primary, #17191c); color: var(--dsw-alias-bg-base, #fff); cursor: pointer; font: inherit; font-size: 12px; }
+.composerActions button:disabled { opacity: .42; cursor: default; }
 
 .loadMore { min-height: 54px; display: grid; place-items: center; color: var(--dsw-alias-label-tertiary, #969ca5); font-size: 11px; }
 .loadMore button, .message button, .retryBanner button { border: 1px solid var(--dsw-alias-border-l2, #d7dbe0); border-radius: 999px; padding: 7px 14px; background: var(--dsw-alias-bg-base, #fff); color: var(--dsw-alias-label-secondary, #676e77); cursor: pointer; font: inherit; font-size: 12px; }
@@ -104,12 +138,14 @@
   .surfaceHeader { padding: 0 16px; gap: 9px; }
   .kicker { display: none; }
   .feed, .skeletonList { width: calc(100% - 24px); }
+  .interactionPanel { width: calc(100% - 24px); }
   .card { padding: 16px; }
   .imageGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .previewBackdrop { padding: 12px; }
   .previewStage { grid-template-columns: 1fr 1fr; align-content: center; }
   .previewImage, .previewFailure { grid-column: 1 / -1; grid-row: 1; max-height: calc(100vh - 140px); }
   .previewNav { grid-row: 2; }
+  .interactionReply { margin-left: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

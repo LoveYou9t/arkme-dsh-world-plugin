@@ -4,10 +4,12 @@ import {
   calculateWorldPreviewIndex,
   WorldFooterEntry,
   WorldImagePreview,
+  WorldInteractionPanel,
   WorldStateView,
 } from '../src/client/WorldFooterEntry.js'
 import { calculateWorldFrame, WORLD_BRAND_LABEL } from '../src/client/WorldSurface.js'
 import type { WorldFeedSnapshot } from '../src/client/world-feed-store.js'
+import type { WorldInteractionSnapshot } from '../src/client/world-interaction-store.js'
 
 const sdk = {
   readWorldImage: vi.fn(),
@@ -60,9 +62,41 @@ describe('World desktop UI', () => {
     expect(html).toContain('傍晚散步')
     expect(html).toContain('2 张图片 · 1 个视频 · 1 条语音')
     expect(html).toContain('3 条互动')
+    expect(html).toContain('查看 3 条互动')
     expect(html).not.toContain('发布')
     expect(html).not.toContain('举报')
     expect(html).not.toContain('分享')
+  })
+
+  it('renders a reply-aware interaction detail with sending and failure feedback', () => {
+    const item = {
+      recordRef: 'record-ref', authorName: '小林', headline: '', textContent: '今天的风很舒服', tags: [],
+      templateKind: 1, createdAtMillis: 1, publishedAtMillis: 2, imageRefs: [], imageCount: 0,
+      videoCount: 0, voiceCount: 0, extendCount: 1,
+    }
+    const snapshot: WorldInteractionSnapshot = {
+      status: 'success', rootRef: 'record-ref', items: [{
+        interactionRef: 'comment-ref', parentRef: 'record-ref', authorName: '阿七', textContent: '第一条评论',
+        createdAtMillis: 3, publishedAtMillis: 4, imageCount: 0, videoCount: 0, voiceCount: 0,
+      }], total: 1, hasMore: false, sending: false, loadingMore: false, draft: '回复内容',
+      replyTarget: { interactionRef: 'comment-ref', authorName: '阿七' }, sendError: '发送失败',
+    }
+    const interactionStore = {
+      setDraft: vi.fn(), setReplyTarget: vi.fn(), clearReplyTarget: vi.fn(), submit: vi.fn(), open: vi.fn(),
+    } as never
+    const html = renderToStaticMarkup(<WorldInteractionPanel
+      sdk={sdk}
+      item={item}
+      store={interactionStore}
+      snapshot={snapshot}
+      onClose={vi.fn()}
+    />)
+
+    expect(html).toContain('今天的风很舒服')
+    expect(html).toContain('第一条评论')
+    expect(html).toContain('回复 阿七')
+    expect(html).toContain('发送失败')
+    expect(html).toContain('>重新发送</button>')
   })
 
   it('renders the same color-index and label semantics for phone-default avatars', () => {

@@ -2,9 +2,11 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactN
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { createArkmeSdk } from '@senguoyun/dsh-arkme/sdk'
 import { WorldFeedStore, type WorldFeedSnapshot } from './world-feed-store.js'
+import { WorldInteractionStore, type WorldInteractionSnapshot } from './world-interaction-store.js'
 import {
   createWorldProviderClient,
   type ArkmeWorldFeedItem,
+  type ArkmeWorldInteractionItem,
   type WorldProviderClient,
 } from './world-provider-client.js'
 import { WorldSurface } from './WorldSurface.js'
@@ -124,7 +126,9 @@ function timeLabel(value: number): string {
     : { year: 'numeric', month: 'numeric', day: 'numeric' }).format(date)
 }
 
-function WorldAvatarFallback({ item }: { item: ArkmeWorldFeedItem }) {
+function WorldAvatarFallback({ item }: {
+  item: Pick<ArkmeWorldFeedItem, 'authorName' | 'avatarFallback'>
+}) {
   if (item.avatarFallback?.kind === 'phone_default') return <span
     className={`${css.avatarFallback} ${css.phoneDefaultAvatar}`}
     style={{ backgroundColor: PHONE_DEFAULT_AVATAR_COLORS[Math.abs(item.avatarFallback.colorIndex) % PHONE_DEFAULT_AVATAR_COLORS.length] }}
@@ -133,10 +137,11 @@ function WorldAvatarFallback({ item }: { item: ArkmeWorldFeedItem }) {
   return <span className={css.avatarFallback} aria-hidden>{item.authorName.slice(0, 1)}</span>
 }
 
-function WorldCard({ sdk, item, onPreview }: {
+function WorldCard({ sdk, item, onPreview, onOpenInteractions }: {
   sdk: WorldProviderClient
   item: ArkmeWorldFeedItem
   onPreview(imageRefs: string[], authorName: string, index: number, trigger: HTMLButtonElement): void
+  onOpenInteractions(item: ArkmeWorldFeedItem): void
 }) {
   const body = item.textContent.trim()
   const mediaLabels = [
@@ -176,11 +181,103 @@ function WorldCard({ sdk, item, onPreview }: {
         </button>}
       />)}
     </div>}
-    {(mediaLabels.length > 0 || item.extendCount > 0) && <footer className={css.cardFooter}>
+    <footer className={css.cardFooter}>
       <span>{mediaLabels.join(' · ')}</span>
-      {item.extendCount > 0 && <span>{item.extendCount} 条互动</span>}
-    </footer>}
+      <button type="button" onClick={() => { onOpenInteractions(item) }}>
+        {item.extendCount > 0 ? `查看 ${String(item.extendCount)} 条互动` : '参与互动'}
+      </button>
+    </footer>
   </article>
+}
+
+function InteractionAvatar({ sdk, item }: { sdk: WorldProviderClient; item: ArkmeWorldInteractionItem }) {
+  return item.avatarRef === undefined
+    ? <WorldAvatarFallback item={item} />
+    : <WorldImage
+      sdk={sdk}
+      imageRef={item.avatarRef}
+      alt={`${item.authorName}的头像`}
+      className={css.interactionAvatar!}
+      eager
+      fallback={<WorldAvatarFallback item={item} />}
+    />
+}
+
+export function WorldInteractionPanel({ sdk, item, store, snapshot, onClose }: {
+  sdk: WorldProviderClient
+  item: ArkmeWorldFeedItem
+  store: WorldInteractionStore
+  snapshot: WorldInteractionSnapshot
+  onClose(): void
+}) {
+  const replyTarget = snapshot.replyTarget
+  return <section className={css.interactionPanel} aria-label="世界互动详情">
+    <header className={css.interactionHeader}>
+      <div>
+        <span>互动详情</span>
+        <strong>{item.authorName}</strong>
+      </div>
+      <button type="button" onClick={onClose}>返回世界</button>
+    </header>
+    <article className={css.interactionRoot}>
+      {item.headline !== '' && <h2>{item.headline}</h2>}
+      {item.textContent.trim() !== '' && <p>{item.textContent}</p>}
+    </article>
+    <div className={css.interactionList} aria-live="polite">
+      {snapshot.status === 'loading' && <p className={css.interactionNotice}>互动加载中…</p>}
+      {snapshot.status === 'unsupported' && <p className={css.interactionNotice}>当前 Arkme Provider 版本还不支持互动，请升级后重试。</p>}
+      {snapshot.status === 'error' && <div className={css.interactionNotice} role="alert">
+        <span>{snapshot.error ?? '互动暂时无法加载'}</span>
+        <button type="button" onClick={() => { void store.open(item.recordRef) }}>重新加载</button>
+      </div>}
+      {snapshot.status === 'empty' && <p className={css.interactionNotice}>还没有互动，来写第一条评论吧。</p>}
+      {snapshot.items.map(interaction => <article
+        key={interaction.interactionRef}
+        className={`${css.interactionItem} ${interaction.parentRef === item.recordRef ? '' : css.interactionReply}`}
+      >
+        <InteractionAvatar sdk={sdk} item={interaction} />
+        <div className={css.interactionContent}>
+          <header>
+            <strong>{interaction.authorName}</strong>
+            <time>{timeLabel(interaction.publishedAtMillis || interaction.createdAtMillis)}</time>
+          </header>
+          <p>{interaction.textContent}</p>
+          <button type="button" disabled={snapshot.sending} onClick={() => {
+            store.setReplyTarget({ interactionRef: interaction.interactionRef, authorName: interaction.authorName })
+          }}>回复</button>
+        </div>
+      </article>)}
+      {(snapshot.hasMore || snapshot.incrementalError !== undefined) && <div className={css.interactionLoadMore}>
+        {snapshot.incrementalError !== undefined && <span role="status">{snapshot.incrementalError}</span>}
+        <button type="button" disabled={snapshot.loadingMore} onClick={() => { void store.loadMore() }}>
+          {snapshot.loadingMore ? '正在加载更多…' : snapshot.incrementalError === undefined ? '加载更多互动' : '重试加载'}
+        </button>
+      </div>}
+    </div>
+    {snapshot.status !== 'unsupported' && <form className={css.interactionComposer} onSubmit={event => {
+      event.preventDefault()
+      void store.submit()
+    }}>
+      {replyTarget !== undefined && <div className={css.replyTarget}>
+        <span>回复 {replyTarget.authorName}</span>
+        <button type="button" disabled={snapshot.sending} onClick={() => { store.clearReplyTarget() }}>取消回复</button>
+      </div>}
+      <textarea
+        value={snapshot.draft}
+        disabled={snapshot.sending}
+        maxLength={20_000}
+        placeholder={replyTarget === undefined ? '写一条评论…' : `回复 ${replyTarget.authorName}…`}
+        aria-label={replyTarget === undefined ? '评论内容' : `回复 ${replyTarget.authorName}`}
+        onChange={event => { store.setDraft(event.currentTarget.value) }}
+      />
+      <div className={css.composerActions}>
+        {snapshot.sendError !== undefined && <span role="alert">{snapshot.sendError}</span>}
+        <button type="submit" disabled={snapshot.sending || snapshot.draft.trim() === ''}>
+          {snapshot.sending ? '发送中…' : snapshot.sendError === undefined ? '发送' : '重新发送'}
+        </button>
+      </div>
+    </form>}
+  </section>
 }
 
 export function calculateWorldPreviewIndex(current: number, count: number, direction: -1 | 1): number {
@@ -269,6 +366,13 @@ export function WorldStateView({ sdk, store, snapshot }: {
   const sentinel = useRef<HTMLDivElement>(null)
   const previewTrigger = useRef<HTMLButtonElement>()
   const [preview, setPreview] = useState<{ imageRefs: string[]; authorName: string; activeIndex: number }>()
+  const interactionStore = useMemo(() => new WorldInteractionStore(sdk), [sdk])
+  const interactionSnapshot = useSyncExternalStore(
+    interactionStore.subscribe,
+    interactionStore.getSnapshot,
+    interactionStore.getSnapshot,
+  )
+  const [interactionItem, setInteractionItem] = useState<ArkmeWorldFeedItem>()
   const closePreview = () => {
     setPreview(undefined)
     window.requestAnimationFrame(() => { previewTrigger.current?.focus() })
@@ -284,8 +388,13 @@ export function WorldStateView({ sdk, store, snapshot }: {
     return () => { observer.disconnect() }
   }, [snapshot.hasMore, snapshot.status, store])
   useEffect(() => {
-    if (snapshot.status !== 'success') setPreview(undefined)
-  }, [snapshot.status])
+    if (snapshot.status !== 'success') {
+      setPreview(undefined)
+      setInteractionItem(undefined)
+      interactionStore.reset()
+    }
+  }, [interactionStore, snapshot.status])
+  useEffect(() => () => { interactionStore.reset() }, [interactionStore])
 
   if (snapshot.status === 'idle' || snapshot.status === 'checking' || snapshot.status === 'loading') {
     return <div className={css.skeletonList} aria-label="世界加载中">
@@ -320,6 +429,13 @@ export function WorldStateView({ sdk, store, snapshot }: {
     action="刷新"
     onAction={() => { void store.refresh() }}
   />
+  if (interactionItem !== undefined) return <WorldInteractionPanel
+    sdk={sdk}
+    item={interactionItem}
+    store={interactionStore}
+    snapshot={interactionSnapshot}
+    onClose={() => { setInteractionItem(undefined); interactionStore.reset() }}
+  />
   return <div className={css.feed}>
     {snapshot.incrementalError !== undefined && <div className={css.retryBanner} role="status">
       <span>{snapshot.incrementalError}</span>
@@ -333,6 +449,10 @@ export function WorldStateView({ sdk, store, snapshot }: {
         onPreview={(imageRefs, authorName, activeIndex, trigger) => {
           previewTrigger.current = trigger
           setPreview({ imageRefs, authorName, activeIndex })
+        }}
+        onOpenInteractions={selected => {
+          setInteractionItem(selected)
+          void interactionStore.open(selected.recordRef)
         }}
       />)}
     </div>

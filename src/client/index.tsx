@@ -17,3 +17,4 @@ export function apply(ctx: ClientContext): void {
 
 export { WorldFooterEntry } from './WorldFooterEntry.js'
 export { WorldFeedStore } from './world-feed-store.js'
+export { WorldInteractionStore } from './world-interaction-store.js'

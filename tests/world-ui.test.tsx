@@ -48,6 +48,41 @@ describe('World desktop UI', () => {
     expect(html).toContain('data-owner-rendered="true"')
   })
 
+  it('derives selection from the Arkme owner and asks it to close the active World entry', () => {
+    let row: { selected: boolean; onClick(): void } | undefined
+    const renderRow = vi.fn((next: { selected: boolean; onClick(): void }) => {
+      row = next
+      return <button type="button">世界</button>
+    })
+    const activateEntry = vi.fn()
+    const useSessions = ((selector: (state: { current: string }) => unknown) => selector({ current: 'session-1' })) as never
+
+    renderToStaticMarkup(<WorldDirectoryEntry {...({
+      activeEntryId: 'arkme-world', activateEntry, renderRow, useSessions,
+    } as never)} />)
+
+    expect(row?.selected).toBe(true)
+    row?.onClick()
+    expect(activateEntry).toHaveBeenCalledWith(undefined)
+  })
+
+  it('asks the Arkme owner to activate World instead of keeping private open state', () => {
+    let row: { onClick(): void } | undefined
+    const renderRow = vi.fn((next: { onClick(): void }) => {
+      row = next
+      return <button type="button">世界</button>
+    })
+    const activateEntry = vi.fn()
+    const useSessions = ((selector: (state: { current: string }) => unknown) => selector({ current: 'session-1' })) as never
+
+    renderToStaticMarkup(<WorldDirectoryEntry {...({
+      activeEntryId: undefined, activateEntry, renderRow, useSessions,
+    } as never)} />)
+
+    row?.onClick()
+    expect(activateEntry).toHaveBeenCalledWith('arkme-world')
+  })
+
   it('uses the Arkme brand in the World surface header', () => {
     expect(WORLD_BRAND_LABEL).toBe('ARKME WORLD')
   })

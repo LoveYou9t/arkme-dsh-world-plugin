@@ -1,6 +1,6 @@
 {
   "name": "@senguoyun/dsh-arkme-world",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Desktop World surface for the Arkme DeepSeek Harness provider",
   "license": "UNLICENSED",
   "repository": {
@@ -59,7 +59,7 @@
     "@deepseek-ai/dsh-client-ui-layout": "^0.1.0-rc.5",
     "@deepseek-ai/dsh-client-ui-sidebar": "^0.1.0-rc.5",
     "@deepseek-ai/dsh-client-ui-slots": "^0.1.0-rc.5",
-    "@senguoyun/dsh-arkme": ">=0.2.18",
+    "@senguoyun/dsh-arkme": ">=0.2.19",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

@@ -39,7 +39,7 @@ describe('@senguoyun/dsh-arkme-world package contract', () => {
       extends?: string
     }
 
-    expect(manifest.peerDependencies?.['@senguoyun/dsh-arkme']).toBe('>=0.2.18')
+    expect(manifest.peerDependencies?.['@senguoyun/dsh-arkme']).toBe('>=0.2.19')
     expect(manifest.devDependencies?.['@senguoyun/dsh-arkme']).toBe('0.1.4')
     expect(JSON.stringify(manifest)).not.toContain('workspace:')
     expect(tsconfig.extends).toBeUndefined()

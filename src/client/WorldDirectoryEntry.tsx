@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react'
 import { createArkmeSdk } from '@senguoyun/dsh-arkme/sdk'
 import type { ArkmeDirectoryEntryComponentProps } from './slots-contract.js'
 import { createWorldProviderClient } from './world-provider-client.js'
@@ -17,12 +17,14 @@ function previewText(status: WorldFeedStore['snapshot']['status'], count: number
   }
 }
 
+export const WORLD_DIRECTORY_ENTRY_ID = 'arkme-world'
+
 /** One directory row inside the Arkme dropdown; clicking opens the World surface. */
 export function WorldDirectoryEntry(props: ArkmeDirectoryEntryComponentProps) {
   const sdk = useMemo(() => createWorldProviderClient(createArkmeSdk()), [])
   const store = useMemo(() => new WorldFeedStore(sdk), [sdk])
   const snapshot = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot)
-  const [open, setOpen] = useState(false)
+  const open = props.activeEntryId === WORLD_DIRECTORY_ENTRY_ID
   const currentSession = props.useSessions(state => state.current)
   const openedFromSession = useRef(currentSession)
 
@@ -36,21 +38,21 @@ export function WorldDirectoryEntry(props: ArkmeDirectoryEntryComponentProps) {
   }, [open, snapshot.status, store])
   useEffect(() => {
     if (open && currentSession !== openedFromSession.current) {
-      setOpen(false)
-      store.reset()
+      props.activateEntry(undefined)
     }
-  }, [currentSession, open, store])
+  }, [currentSession, open, props.activateEntry])
+  useEffect(() => {
+    if (!open) store.reset()
+  }, [open, store])
   useEffect(() => () => { store.reset() }, [store])
 
   const toggle = () => {
     if (open) {
-      setOpen(false)
-      store.reset()
+      props.activateEntry(undefined)
       return
     }
     openedFromSession.current = currentSession
-    setOpen(true)
-    void store.load()
+    props.activateEntry(WORLD_DIRECTORY_ENTRY_ID)
   }
 
   return <>
@@ -63,7 +65,7 @@ export function WorldDirectoryEntry(props: ArkmeDirectoryEntryComponentProps) {
       onClick: toggle,
     })}
     {open && <WorldSurface
-      close={() => { setOpen(false); store.reset() }}
+      close={() => { props.activateEntry(undefined) }}
       refresh={() => { void store.refresh() }}
       refreshing={snapshot.refreshing}
       openedFromSession={openedFromSession.current}

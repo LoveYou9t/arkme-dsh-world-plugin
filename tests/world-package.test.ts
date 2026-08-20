@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 const root = resolve(import.meta.dirname, '..')
 
 describe('@senguoyun/dsh-arkme-world package contract', () => {
-  it('ships as an independent DSH client plugin and uses only the official sidebar slot', () => {
+  it('ships as an independent DSH bundle and contributes through the Arkme directory slot', () => {
     const manifest = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')) as {
       name: string
       files?: string[]
@@ -18,11 +18,14 @@ describe('@senguoyun/dsh-arkme-world package contract', () => {
     expect(manifest.repository?.url).toBe('git+https://github.com/LoveYou9t/arkme-dsh-world-plugin.git')
     expect(manifest.dsh?.bundle?.patch).toBe('./cordis.patch.yml')
     expect(manifest.files).toContain('cordis.patch.yml')
-    expect(readFileSync(resolve(root, 'cordis.patch.yml'), 'utf8').trim()).toBe('[]')
+    const patch = readFileSync(resolve(root, 'cordis.patch.yml'), 'utf8')
+    expect(patch).toContain("name: '@senguoyun/dsh-arkme-world'")
     expect(manifest.dsh?.client?.platform).toBe('web')
     expect(manifest.dsh?.client?.inject).toContain('@deepseek-ai/dsh-client-ui-sidebar')
-    expect(source).toContain("ctx.slots.inject('sidebar.footer.action'")
+    expect(source).toContain("ctx.slots.inject('arkme.directory.entry'")
     expect(source).toContain("id: 'arkme-world'")
+    expect(source).not.toContain('sidebar.footer.action')
+    expect(readFileSync(resolve(root, 'src/client/WorldDirectoryEntry.tsx'), 'utf8')).not.toContain('onActivateSurface')
     expect(source).not.toContain('fetch(')
     expect(source).not.toContain('world.jotmo')
   })
@@ -36,7 +39,7 @@ describe('@senguoyun/dsh-arkme-world package contract', () => {
       extends?: string
     }
 
-    expect(manifest.peerDependencies?.['@senguoyun/dsh-arkme']).toBe('>=0.2.14')
+    expect(manifest.peerDependencies?.['@senguoyun/dsh-arkme']).toBe('>=0.2.18')
     expect(manifest.devDependencies?.['@senguoyun/dsh-arkme']).toBe('0.1.4')
     expect(JSON.stringify(manifest)).not.toContain('workspace:')
     expect(tsconfig.extends).toBeUndefined()

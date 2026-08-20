@@ -1,6 +1,6 @@
 {
   "name": "@senguoyun/dsh-arkme-world",
-  "version": "0.2.1",
+  "version": "0.2.6",
   "description": "Desktop World surface for the Arkme DeepSeek Harness provider",
   "license": "UNLICENSED",
   "repository": {
@@ -28,7 +28,10 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["lib", "cordis.patch.yml"],
+  "files": [
+    "lib",
+    "cordis.patch.yml"
+  ],
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
@@ -56,7 +59,7 @@
     "@deepseek-ai/dsh-client-ui-layout": "^0.1.0-rc.5",
     "@deepseek-ai/dsh-client-ui-sidebar": "^0.1.0-rc.5",
     "@deepseek-ai/dsh-client-ui-slots": "^0.1.0-rc.5",
-    "@senguoyun/dsh-arkme": ">=0.2.14",
+    "@senguoyun/dsh-arkme": ">=0.2.18",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

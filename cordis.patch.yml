@@ -1,1 +1,4 @@
-[]
+- insert:
+    - id: arkme-world
+      name: '@senguoyun/dsh-arkme-world'
+      config: {}

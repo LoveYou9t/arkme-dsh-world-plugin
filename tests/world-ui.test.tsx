@@ -7,6 +7,7 @@ import {
   WorldInteractionPanel,
   WorldStateView,
 } from '../src/client/WorldFooterEntry.js'
+import { WorldDirectoryEntry } from '../src/client/WorldDirectoryEntry.js'
 import { calculateWorldFrame, WORLD_BRAND_LABEL } from '../src/client/WorldSurface.js'
 import type { WorldFeedSnapshot } from '../src/client/world-feed-store.js'
 import type { WorldInteractionSnapshot } from '../src/client/world-interaction-store.js'
@@ -30,6 +31,23 @@ const base: WorldFeedSnapshot = {
 }
 
 describe('World desktop UI', () => {
+  it('delegates its directory row chrome to the Arkme slot owner', () => {
+    const renderRow = vi.fn((row: { title: string; preview: string }) => (
+      <button type="button" data-owner-rendered="true">{row.title} · {row.preview}</button>
+    ))
+    const useSessions = ((selector: (state: { current: string }) => unknown) => selector({ current: 'session-1' })) as never
+
+    const html = renderToStaticMarkup(<WorldDirectoryEntry {...({ renderRow, useSessions } as never)} />)
+
+    expect(renderRow).toHaveBeenCalledOnce()
+    expect(renderRow).toHaveBeenCalledWith(expect.objectContaining({
+      title: '世界',
+      selected: false,
+      onClick: expect.any(Function),
+    }))
+    expect(html).toContain('data-owner-rendered="true"')
+  })
+
   it('uses the Arkme brand in the World surface header', () => {
     expect(WORLD_BRAND_LABEL).toBe('ARKME WORLD')
   })
